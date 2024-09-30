@@ -1,0 +1,6 @@
+fuzzy array[int; 5] collection = [0, 1, 2, 3, 4];
+
+every item from collection {
+    fuzzy int item_squarred = item * item;
+    labs(item_squarred);
+}

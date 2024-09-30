@@ -1,0 +1,32 @@
+fail_fast: false
+
+repos:
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.5.0
+    hooks:
+      - id: check-toml
+      - id: check-yaml
+        args: ["--unsafe"] # only check syntax for yaml files
+      - id: check-json
+      - id: mixed-line-ending
+        files: "\\.(py|txt|yaml|json|md|toml|lock|cfg|html|sh|js|yml)$"
+      - id: trailing-whitespace
+        files: "\\.(py|txt|yaml|json|md|toml|lock|cfg|html|sh|js|yml)$"
+      - id: end-of-file-fixer
+      - id: check-added-large-files
+        args: ["--maxkb=1000"]
+      - id: check-case-conflict
+      - id: requirements-txt-fixer
+
+  - repo: https://github.com/psf/black
+    rev: 23.10.1
+    hooks:
+      - id: black
+        args: [--config=pyproject.toml]
+
+  - repo: https://github.com/crate-ci/typos
+    rev: typos-dict-v0.11.2
+    hooks:
+      - id: typos
+        args: [--config=pyproject.toml]
+        pass_filenames: false

@@ -1,0 +1,40 @@
+comment: `fuzzy` is an assignment statement
+
+comment: `labs` is a print statement
+
+comment: `suzy` declares a function - functions can only receive a single input
+
+comment: all functions must end with `flabs`
+
+comment: to denote the types you must annotate the function with curly brackets
+comment: showing how the input type transitioned to the output type.
+
+suzy square(a) {float -> float} {
+    fuzzy float x = a * a;
+    flabs x
+}
+
+fuzzy array[int; 5] collection = [0, 1, 2, 3, 4];
+
+every item from collection {
+    labs(item);
+}
+
+suzy sum_of_first_n_natural_numbers(n) {int -> int} {
+    fuzzy int n_plus_one = n + 1;
+    fuzzy int n_product = n * n_plus_one;
+    fuzzy int sum = n_product / 2;
+    flabs sum
+}
+
+fuzzy float x = square(10.1);
+
+fuzzy string y = "scott";
+
+fuzzy int sum_of_first_ten_natural_numbers = sum_of_first_n_natural_numbers(10);
+
+labs(x);
+
+labs(y);
+
+labs(sum_of_first_ten_natural_numbers);
