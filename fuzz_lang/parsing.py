@@ -11,9 +11,12 @@ Tokens = list[tuple[str, str]]
 
 
 class Node(ABC):
+    """Abstract class representing a Node in a fuzz-lang AST."""
+
     offset: int = 1
 
     def __init__(self, tokens: Tokens) -> None:
+        """Constructor for Node."""
         self._build_node(tokens)
 
     @abstractmethod
@@ -21,7 +24,9 @@ class Node(ABC):
         pass
 
 
-class LetStatement(Node):
+class AssignmentStatement(Node):
+    """An assignment statement node in the AST."""
+
     var_name: str
     var_type: str
     expr: Any
@@ -113,31 +118,45 @@ class LetStatement(Node):
 
 
 class BinaryOp:
+    """A structure representing a binary operation in an AST."""
+
     def __init__(self, left: Any, op: str, right: Any):
+        """The constructor for BinaryOp."""
         self.left = left
         self.op = op
         self.right = right
 
 
 class Number:
+    """A structure representing a number in an AST."""
+
     def __init__(self, value: str):
+        """The constructor for Number."""
         self.value = value
 
 
 class String:
+    """A structure representing a string in an AST."""
+
     def __init__(self, value: str):
+        """The constructor for String."""
         self.value = value
 
 
 class Array:
+    """A structure representing an array in an AST."""
+
     values: list[Any] = []
 
     def __init__(self, _type: str, length: int):
+        """The constructor for Array."""
         self._type = _type
         self.length = length
 
 
 class Loop(Node):
+    """A loop statement in an AST."""
+
     collection_name: str
     element_name: str
 
@@ -150,11 +169,16 @@ class Loop(Node):
 
 
 class Variable:
+    """A structure representing an expression in an AST."""
+
     def __init__(self, name: str):
+        """The constructor for Variable."""
         self.name = name
 
 
 class Function(Node):
+    """A function node in an AST."""
+
     func_name: str
     arg: str
     input_type: str
@@ -184,6 +208,8 @@ class Function(Node):
 
 
 class ReturnStatement(Node):
+    """A return statement node in an AST."""
+
     expr: Variable | Number
     offset = 1
 
@@ -200,6 +226,8 @@ class ReturnStatement(Node):
 
 
 class FunctionCall:
+    """A structure represening a function call in an AST."""
+
     def __init__(
         self,
         func_name: str,
@@ -207,6 +235,7 @@ class FunctionCall:
         input_type: Optional[str] = None,
         output_type: Optional[str] = None,
     ) -> None:
+        """The constructor for FunctionCall."""
         self.func_name = func_name
         self.arg = arg
         self.input_type = input_type
@@ -214,6 +243,8 @@ class FunctionCall:
 
 
 class EndLoop(Node):
+    """An node representing that a node has ended in an AST."""
+
     token = "}"
     offset = 1
 
@@ -222,6 +253,8 @@ class EndLoop(Node):
 
 
 class PrintStatement(Node):
+    """A print statement node in an AST."""
+
     expr: Variable | Number
 
     def _build_node(self, tokens: Tokens) -> None:
@@ -242,6 +275,8 @@ class PrintStatement(Node):
 
 
 class Types(StrEnum):
+    """An enum representing the different types available in fuzz-lang."""
+
     INT = "int"
     FLOAT = "float"
     STRING = "string"
@@ -249,7 +284,9 @@ class Types(StrEnum):
 
 
 class Nodes(Enum):
-    ASSIGNMENT = LetStatement
+    """An enum representing the different nodes in an AST."""
+
+    ASSIGNMENT = AssignmentStatement
     PRINT = PrintStatement
     BINARY = BinaryOp
     NUMBER = Number
@@ -263,7 +300,8 @@ class Nodes(Enum):
     END_LOOP = EndLoop
 
 
-def process_token(tokens: Tokens) -> Node:
+def build_ast_node(tokens: Tokens) -> Node:
+    """A function to build a node to add to the AST."""
     current_token = tokens[0]
     match current_token[0]:
         case Tokenizer.FUNCTION.name:
@@ -279,7 +317,7 @@ def process_token(tokens: Tokens) -> Node:
             node = Loop(tokens)
 
         case Tokenizer.ASSIGNMENT.name:
-            node = LetStatement(tokens)
+            node = AssignmentStatement(tokens)
 
         case Tokenizer.PRINT.name:
             node = PrintStatement(tokens)
@@ -297,7 +335,7 @@ def parse(tokens: Tokens) -> list[Node]:
     ast: list[Node] = []
 
     while tokens:
-        node = process_token(tokens)
+        node = build_ast_node(tokens)
         ast.append(node)
         tokens = tokens[node.offset :]
 

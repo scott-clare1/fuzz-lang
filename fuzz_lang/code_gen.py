@@ -4,7 +4,7 @@ from typing import Any
 
 from fuzz_lang.transpiler.parsing import (
     Function,
-    LetStatement,
+    AssignmentStatement,
     Loop,
     Node,
     Nodes,
@@ -40,10 +40,10 @@ class CodeGeneration:
         self.target_code = []
 
     @staticmethod
-    def construct_rust_loop(node: Loop):
+    def _construct_rust_loop(node: Loop):
         return f"for {node.element_name} in {node.collection_name}.iter() {{"
 
-    def construct_rust_assignment(self, node: LetStatement):
+    def _construct_rust_assignment(self, node: AssignmentStatement):
         expr = self.generate_expression(node.expr)
 
         if node.var_type == "array":
@@ -51,14 +51,14 @@ class CodeGeneration:
         else:
             return f"let {node.var_name}: {get_rust_type(node.var_type)} = {expr};"
 
-    def construct_rust_print_statement(self, node: PrintStatement):
+    def _construct_rust_print_statement(self, node: PrintStatement):
         expr = self.generate_expression(node.expr)
         return f'println!("{{}}", {expr});'
 
-    def construct_rust_function_header(self, node: Function):
+    def _construct_rust_function_header(self, node: Function):
         return f"fn {node.func_name}({node.arg}: {get_rust_type(node.input_type)}) -> {get_rust_type(node.output_type)} {{"
 
-    def construct_rust_return_statement(self, node: ReturnStatement):
+    def _construct_rust_return_statement(self, node: ReturnStatement):
         expr = self.generate_expression(node.expr)
         return f"return {expr};}}"
 
@@ -73,23 +73,23 @@ class CodeGeneration:
             node = ast[i]
             match type(node):
                 case Nodes.LOOP.value:
-                    self.target_code.append(self.construct_rust_loop(node))
+                    self.target_code.append(self._construct_rust_loop(node))
 
                 case Nodes.END_LOOP.value:
                     self.target_code.append(node.token)
 
                 case Nodes.ASSIGNMENT.value:
-                    self.target_code.append(self.construct_rust_assignment(node))
+                    self.target_code.append(self._construct_rust_assignment(node))
 
                 case Nodes.PRINT.value:
-                    self.target_code.append(self.construct_rust_print_statement(node))
+                    self.target_code.append(self._construct_rust_print_statement(node))
 
                 case Nodes.FUNCTION.value:
                     counter = 0
 
                     self.target_code.insert(
                         counter,
-                        self.construct_rust_function_header(node),
+                        self._construct_rust_function_header(node),
                     )
                     counter += 1
                     i += 1
@@ -97,7 +97,7 @@ class CodeGeneration:
                     while type(node) in [Nodes.ASSIGNMENT.value]:
                         self.target_code.insert(
                             counter,
-                            self.construct_rust_assignment(node),
+                            self._construct_rust_assignment(node),
                         )
                         counter += 1
                         i += 1
@@ -107,7 +107,7 @@ class CodeGeneration:
                         raise RuntimeError()
                     else:
                         self.target_code.insert(
-                            counter, self.construct_rust_return_statement(node)
+                            counter, self._construct_rust_return_statement(node)
                         )
 
                 case _:
