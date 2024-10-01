@@ -1,0 +1,3 @@
+fuzzy string x = "Hello world!";
+
+labs(x);

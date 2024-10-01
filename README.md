@@ -48,5 +48,23 @@ every item from collection {
 }
 ```
 
+## How do I compile `fuzz-lang`?
+
+Clone this repository and then run the following:
+
+```make fuzz-lang```
+
+Then start compiling `fuzz` to executables:
+
+```
+fuzz-lang examples/hello_world.fuzz hello_world
+```
+
+Execute program:
+
+```
+./hello_world
+```
+
 # &#127939; How do I get started?
 You don't.
