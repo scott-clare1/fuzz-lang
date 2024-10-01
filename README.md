@@ -69,7 +69,9 @@ labs(result);
 
 Clone this repository and then run the following:
 
-```make fuzz-lang```
+```
+make fuzz-lang
+```
 
 Then start compiling `fuzz` to executables:
 
