@@ -2,7 +2,15 @@
 
 from typing import Any
 
-from fuzz_lang.transpiler.parsing import Nodes
+from fuzz_lang.transpiler.parsing import (
+    Function,
+    LetStatement,
+    Loop,
+    Node,
+    Nodes,
+    PrintStatement,
+    ReturnStatement,
+)
 
 
 def get_rust_type(_type: str) -> str:
@@ -31,7 +39,30 @@ class CodeGeneration:
         """A method to reset the target code."""
         self.target_code = []
 
-    def code_generation(self, ast: list[Any]) -> str:
+    @staticmethod
+    def construct_rust_loop(node: Loop):
+        return f"for {node.element_name} in {node.collection_name}.iter() {{"
+
+    def construct_rust_assignment(self, node: LetStatement):
+        expr = self.generate_expression(node.expr)
+
+        if node.var_type == "array":
+            return f"let {node.var_name}: [{get_rust_type(node.expr._type)}; {node.expr.length}] = {expr};"
+        else:
+            return f"let {node.var_name}: {get_rust_type(node.var_type)} = {expr};"
+
+    def construct_rust_print_statement(self, node: PrintStatement):
+        expr = self.generate_expression(node.expr)
+        return f'println!("{{}}", {expr});'
+
+    def construct_rust_function_header(self, node: Function):
+        return f"fn {node.func_name}({node.arg}: {get_rust_type(node.input_type)}) -> {get_rust_type(node.output_type)} {{"
+
+    def construct_rust_return_statement(self, node: ReturnStatement):
+        expr = self.generate_expression(node.expr)
+        return f"return {expr};}}"
+
+    def code_generation(self, ast: list[Node]) -> str:
         """A method to perform code generation on an abstract syntax tree."""
         self.reset()
         self.target_code.append("fn main() {")
@@ -42,45 +73,31 @@ class CodeGeneration:
             node = ast[i]
             match type(node):
                 case Nodes.LOOP.value:
-                    self.target_code.append(
-                        f"for {node.element_name} in {node.collection_name}.iter() {{"
-                    )
+                    self.target_code.append(self.construct_rust_loop(node))
 
                 case Nodes.END_LOOP.value:
                     self.target_code.append(node.token)
 
                 case Nodes.ASSIGNMENT.value:
-                    var_name = node.var_name
-                    expr = self.generate_expression(node.expr)
-                    if node.var_type == "array":
-                        self.target_code.append(
-                            f"let {var_name}: [{get_rust_type(node.expr._type)}; {node.expr.length}] = {expr};"
-                        )
-                    else:
-                        self.target_code.append(
-                            f"let {var_name}: {get_rust_type(node.var_type)} = {expr};"
-                        )
+                    self.target_code.append(self.construct_rust_assignment(node))
 
                 case Nodes.PRINT.value:
-                    expr = self.generate_expression(node.expr)
-                    self.target_code.append(f'println!("{{}}", {expr});')
+                    self.target_code.append(self.construct_rust_print_statement(node))
 
                 case Nodes.FUNCTION.value:
                     counter = 0
 
                     self.target_code.insert(
                         counter,
-                        f"fn {node.func_name}({node.arg}: {get_rust_type(node.input_type)}) -> {get_rust_type(node.output_type)} {{",
+                        self.construct_rust_function_header(node),
                     )
                     counter += 1
                     i += 1
                     node = ast[i]
                     while type(node) in [Nodes.ASSIGNMENT.value]:
-                        var_name = node.var_name
-                        expr = self.generate_expression(node.expr)
                         self.target_code.insert(
                             counter,
-                            f"let {var_name}: {get_rust_type(node.var_type)} = {expr};",
+                            self.construct_rust_assignment(node),
                         )
                         counter += 1
                         i += 1
@@ -89,8 +106,9 @@ class CodeGeneration:
                     if type(node) is not Nodes.RETURN.value:
                         raise RuntimeError()
                     else:
-                        expr = self.generate_expression(node.expr)
-                        self.target_code.insert(counter, f"return {expr};}}")
+                        self.target_code.insert(
+                            counter, self.construct_rust_return_statement(node)
+                        )
 
                 case _:
                     raise SyntaxError("Cannot generate code for this Node.")
