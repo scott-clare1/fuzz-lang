@@ -2,7 +2,7 @@
 
 from abc import ABC, abstractmethod
 from enum import Enum, StrEnum
-from typing import Any, Optional
+from typing import Any, Optional, Self
 
 from fuzz_lang.lexical_analysis import Tokenizer
 
@@ -13,6 +13,7 @@ class Node(ABC):
     """Abstract class representing a Node in a fuzz-lang AST."""
 
     offset: int = 1
+    next: Optional[Self] = None
 
     def __init__(self, tokens: Tokens) -> None:
         """Constructor for Node."""
@@ -328,14 +329,32 @@ def build_ast_node(tokens: Tokens) -> Node:
         node.offset += 1
     return node
 
+class AST:
+    """An Abstract Syntax Tree implemented as a linked-list."""
+    def __init__(self):
+        """The constructor for the Abstract Syntax Tree."""
+        self.head: Optional[Node] = None
 
-def parse(tokens: Tokens) -> list[Node]:
+    def insert(self, node: Node) -> None:
+        """A method to insert a node into the end of the linked-list."""
+        if not self.head:
+            self.head = node
+            return
+
+        current = self.head
+        while current.next:
+            current = current.next
+
+        current.next = node
+
+
+def parse(tokens: Tokens) -> AST:
     """A function to build an abstract syntax tree from a collection of tokens."""
-    ast: list[Node] = []
+    ast = AST()
 
     while tokens:
         node = build_ast_node(tokens)
-        ast.append(node)
+        ast.insert(node)
         tokens = tokens[node.offset :]
 
     return ast

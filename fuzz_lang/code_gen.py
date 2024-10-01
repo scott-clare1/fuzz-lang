@@ -4,6 +4,7 @@ from typing import Any
 
 from fuzz_lang.parsing import (
     AssignmentStatement,
+    AST,
     Function,
     Loop,
     Node,
@@ -64,58 +65,56 @@ class CodeGeneration:
         expr = self.generate_expression(node.expr)
         return f"return {expr};}}"
 
-    def code_generation(self, ast: list[Node]) -> str:
+    def code_generation(self, ast: AST) -> str:
         """A method to perform code generation on an abstract syntax tree."""
+
+        if not ast:
+            raise RuntimeError("Empty AST.")
+
         self.reset()
         self.target_code.append("fn main() {")
 
-        i = 0
+        current_node = ast.head
 
-        while i < len(ast):
-            node = ast[i]
-            match type(node):
+        while current_node:
+            match type(current_node):
                 case Nodes.LOOP.value:
-                    self.target_code.append(self._construct_rust_loop(node))
+                    self.target_code.append(self._construct_rust_loop(current_node))
 
                 case Nodes.END_LOOP.value:
-                    self.target_code.append(node.token)
+                    self.target_code.append(current_node.token)
 
                 case Nodes.ASSIGNMENT.value:
-                    self.target_code.append(self._construct_rust_assignment(node))
+                    self.target_code.append(self._construct_rust_assignment(current_node))
 
                 case Nodes.PRINT.value:
-                    self.target_code.append(self._construct_rust_print_statement(node))
+                    self.target_code.append(self._construct_rust_print_statement(current_node))
 
                 case Nodes.FUNCTION.value:
                     counter = 0
 
                     self.target_code.insert(
                         counter,
-                        self._construct_rust_function_header(node),
+                        self._construct_rust_function_header(current_node),
                     )
-                    counter += 1
-                    i += 1
-                    node = ast[i]
-                    while type(node) in [Nodes.ASSIGNMENT.value]:
+                    while type(current_node) in [Nodes.ASSIGNMENT.value] and current_node:
                         self.target_code.insert(
                             counter,
-                            self._construct_rust_assignment(node),
+                            self._construct_rust_assignment(current_node),
                         )
-                        counter += 1
-                        i += 1
-                        node = ast[i]
+                        current_node = current_node.next
 
-                    if type(node) is not Nodes.RETURN.value:
+                    if type(current_node) is not Nodes.RETURN.value:
                         raise RuntimeError()
                     else:
                         self.target_code.insert(
-                            counter, self._construct_rust_return_statement(node)
+                            counter, self._construct_rust_return_statement(current_node)
                         )
 
                 case _:
                     raise SyntaxError("Cannot generate code for this Node.")
 
-            i += 1
+            current_node = current_node.next
 
         self.target_code.append("}")
         return "\n".join(self.target_code)
