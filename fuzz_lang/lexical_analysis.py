@@ -37,7 +37,7 @@ class Tokenizer(StrEnum):
         return "|".join(f"(?P<{variant.name}>{variant})" for variant in cls)
 
     @classmethod
-    def tokenize(cls, code: str) -> list[str]:
+    def tokenize(cls, code: str) -> list[tuple[str, str]]:
         """A method to perform tokenisation on some source code."""
         tokens = []
         for match in re.finditer(cls.regex(), code):

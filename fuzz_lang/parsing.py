@@ -1,11 +1,10 @@
 """A module for parsing fuzz-lang tokens into an abstract syntax tree."""
 
+from abc import ABC, abstractmethod
 from enum import Enum, StrEnum
 from typing import Any, Optional
-from abc import ABC, abstractmethod
 
-from fuzz_lang.transpiler.lexical_analysis import Tokenizer
-
+from fuzz_lang.lexical_analysis import Tokenizer
 
 Tokens = list[tuple[str, str]]
 

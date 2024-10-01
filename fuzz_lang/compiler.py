@@ -1,13 +1,16 @@
+"""Script to compile fuzz-lang code."""
+
 import argparse
 import os
 import subprocess
 
-from fuzz_lang.transpiler.code_gen import CodeGeneration
-from fuzz_lang.transpiler.lexical_analysis import Tokenizer
-from fuzz_lang.transpiler.parsing import parse
+from fuzz_lang.code_gen import CodeGeneration
+from fuzz_lang.lexical_analysis import Tokenizer
+from fuzz_lang.parsing import parse
 
 
 def compiler():
+    """A function to compile fuzz-lang source code to rust."""
     parser = argparse.ArgumentParser()
     parser.add_argument("filename")
     parser.add_argument("program")
@@ -30,7 +33,6 @@ def compiler():
         f.write(rust_code)
 
     subprocess.run(["rustc", f"__transpiled__/{args.program}.rs"], check=True)
-    subprocess.run([f"./{args.program}"], check=True)
 
 
 if __name__ == "__main__":

@@ -2,9 +2,9 @@
 
 from typing import Any
 
-from fuzz_lang.transpiler.parsing import (
-    Function,
+from fuzz_lang.parsing import (
     AssignmentStatement,
+    Function,
     Loop,
     Node,
     Nodes,
@@ -47,7 +47,8 @@ class CodeGeneration:
         expr = self.generate_expression(node.expr)
 
         if node.var_type == "array":
-            return f"let {node.var_name}: [{get_rust_type(node.expr._type)}; {node.expr.length}] = {expr};"
+            return f"""let {node.var_name}: [{get_rust_type(node.expr._type)};
+            {node.expr.length}] = {expr};"""
         else:
             return f"let {node.var_name}: {get_rust_type(node.var_type)} = {expr};"
 
@@ -56,7 +57,8 @@ class CodeGeneration:
         return f'println!("{{}}", {expr});'
 
     def _construct_rust_function_header(self, node: Function):
-        return f"fn {node.func_name}({node.arg}: {get_rust_type(node.input_type)}) -> {get_rust_type(node.output_type)} {{"
+        return f"""fn {node.func_name}({node.arg}: {get_rust_type(node.input_type)})
+        -> {get_rust_type(node.output_type)} {{"""
 
     def _construct_rust_return_statement(self, node: ReturnStatement):
         expr = self.generate_expression(node.expr)

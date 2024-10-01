@@ -24,6 +24,23 @@ repos:
       - id: black
         args: [--config=pyproject.toml]
 
+  - repo: https://github.com/charliermarsh/ruff-pre-commit
+    # Ruff version.
+    rev: "v0.6.8"
+    hooks:
+      - id: ruff
+        args: [
+            --fix,
+            --exit-non-zero-on-fix,
+            "--config=pyproject.toml",
+            "--ignore",
+            "C901",
+            "--ignore",
+            "PLR0915",
+            "--ignore",
+            "PLR0912",
+          ] # enable autofix
+
   - repo: https://github.com/crate-ci/typos
     rev: typos-dict-v0.11.2
     hooks:
