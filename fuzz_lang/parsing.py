@@ -329,8 +329,10 @@ def build_ast_node(tokens: Tokens) -> Node:
         node.offset += 1
     return node
 
+
 class AST:
     """An Abstract Syntax Tree implemented as a linked-list."""
+
     def __init__(self):
         """The constructor for the Abstract Syntax Tree."""
         self.head: Optional[Node] = None

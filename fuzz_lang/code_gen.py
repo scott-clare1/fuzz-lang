@@ -3,11 +3,10 @@
 from typing import Any
 
 from fuzz_lang.parsing import (
-    AssignmentStatement,
     AST,
+    AssignmentStatement,
     Function,
     Loop,
-    Node,
     Nodes,
     PrintStatement,
     ReturnStatement,
@@ -67,7 +66,6 @@ class CodeGeneration:
 
     def code_generation(self, ast: AST) -> str:
         """A method to perform code generation on an abstract syntax tree."""
-
         if not ast:
             raise RuntimeError("Empty AST.")
 
@@ -85,10 +83,14 @@ class CodeGeneration:
                     self.target_code.append(current_node.token)
 
                 case Nodes.ASSIGNMENT.value:
-                    self.target_code.append(self._construct_rust_assignment(current_node))
+                    self.target_code.append(
+                        self._construct_rust_assignment(current_node)
+                    )
 
                 case Nodes.PRINT.value:
-                    self.target_code.append(self._construct_rust_print_statement(current_node))
+                    self.target_code.append(
+                        self._construct_rust_print_statement(current_node)
+                    )
 
                 case Nodes.FUNCTION.value:
                     counter = 0
@@ -97,7 +99,9 @@ class CodeGeneration:
                         counter,
                         self._construct_rust_function_header(current_node),
                     )
-                    while type(current_node) in [Nodes.ASSIGNMENT.value] and current_node:
+                    while (
+                        type(current_node) in [Nodes.ASSIGNMENT.value] and current_node
+                    ):
                         self.target_code.insert(
                             counter,
                             self._construct_rust_assignment(current_node),
