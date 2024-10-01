@@ -40,12 +40,29 @@ comment: e.g., every item from collection { labs(item); }
 Here's an example program to create an array of values and then square each value in the array:
 
 ```
+comment: this program creates an array of 5 integers and then iterates through multiplying it by itself.
+
 fuzzy array[int; 5] collection = [0, 1, 2, 3, 4];
 
 every item from collection {
     fuzzy int item_squarred = item * item;
     labs(item_squarred);
 }
+```
+
+Here's an example function to multiply a float by itself:
+
+```
+comment: this program creates a function `square` creates a value `result` using the function and then prints it out.
+
+suzy square(a) {float -> float} {
+  fuzzy float squarred = a * a;
+  flabs squarred;
+}
+
+fuzzy float result = square(2);
+
+labs(result);
 ```
 
 ## How do I compile `fuzz-lang`?
