@@ -60,7 +60,7 @@ suzy square(a) {float -> float} {
   flabs squarred;
 }
 
-fuzzy float result = square(2);
+fuzzy float result = square(2.0);
 
 labs(result);
 ```
