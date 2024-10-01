@@ -7,7 +7,7 @@ license = "MIT license"
 readme = "README.md"
 
 [tool.poetry.scripts]
-fuzz-lang = "fuzz_lang.compiler:compiler"
+fuzzc = "fuzz_lang.compiler:compiler"
 
 [tool.poetry.dependencies]
 python = "^3.12, <3.13"

@@ -76,7 +76,7 @@ make fuzz-lang
 Then start compiling `fuzz` to executables:
 
 ```
-fuzz-lang examples/hello_world.fuzz hello_world
+fuzzc examples/hello_world.fuzz hello_world
 ```
 
 Execute program:
