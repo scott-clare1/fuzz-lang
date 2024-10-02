@@ -1,6 +1,4 @@
-<h1 align="center">
-    fuzz_lang &#128679;
-</h1>
+# fuzz-lang
 
 A basic implementation of a compiler for `fuzz-lang`.
 
